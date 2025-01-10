@@ -1,6 +1,12 @@
+// Replace with your email address
 const RECIPIENT_EMAIL = "example@example.com";
 
 function onFormSubmit(e) {
+  if (!e || !e.response) {
+    Logger.log("No response data found.");
+    return;
+  }
+
   // Get the response data from the event object
   const response = e.response;
 
@@ -11,11 +17,13 @@ function onFormSubmit(e) {
   // Build the email content
   let emailBody = "New Google Form Response:\n\n";
 
-  items.forEach((item, index) => {
-    const question = item.getTitle();
-    const responseText = response.getResponseForItem(item).getResponse();
+  items.forEach((item) => {
+    const question = item.getTitle(); // Get the question title
+    const responseItem = response.getResponseForItem(item);
 
-    emailBody += `${question}: ${responseText}\n`;
+    // Handle null responses
+    const responseText = responseItem ? responseItem.getResponse() : "No response";
+    emailBody += `Question: ${question}\nResponse: ${responseText}\n\n`;
   });
 
   // Send the email
