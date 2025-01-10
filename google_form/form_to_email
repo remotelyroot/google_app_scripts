@@ -1,0 +1,32 @@
+const RECIPIENT_EMAIL = "example@example.com";
+
+function onFormSubmit(e) {
+  // Get the response data from the event object
+  const response = e.response;
+
+  // Get the form and questions
+  const form = FormApp.getActiveForm();
+  const items = form.getItems();
+
+  // Build the email content
+  let emailBody = "New Google Form Response:\n\n";
+
+  items.forEach((item, index) => {
+    const question = item.getTitle();
+    const responseText = response.getResponseForItem(item).getResponse();
+
+    emailBody += `${question}: ${responseText}\n`;
+  });
+
+  // Send the email
+  GmailApp.sendEmail(RECIPIENT_EMAIL, "New Google Form Response", emailBody);
+}
+
+// Installable trigger setup function
+function setupTrigger() {
+  const form = FormApp.getActiveForm();
+  ScriptApp.newTrigger("onFormSubmit")
+    .forForm(form)
+    .onFormSubmit()
+    .create();
+}
