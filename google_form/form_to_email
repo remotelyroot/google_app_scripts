@@ -7,15 +7,16 @@ function onFormSubmit(e) {
     return;
   }
 
+  // Get the form and its name
+  const form = FormApp.getActiveForm();
+  const formName = form.getTitle();
+
   // Get the response data from the event object
   const response = e.response;
-
-  // Get the form and questions
-  const form = FormApp.getActiveForm();
   const items = form.getItems();
 
-  // Build the email content
-  let emailBody = "New Google Form Response:\n\n";
+  // Build the email content as HTML
+  let emailBody = `<h2>New Response from "${formName}"</h2><table border='1' style='border-collapse:collapse;'>`;
 
   items.forEach((item) => {
     const question = item.getTitle(); // Get the question title
@@ -23,11 +24,21 @@ function onFormSubmit(e) {
 
     // Handle null responses
     const responseText = responseItem ? responseItem.getResponse() : "No response";
-    emailBody += `Question: ${question}\nResponse: ${responseText}\n\n`;
+
+    // Add question and response as a table row
+    emailBody += `
+      <tr>
+        <td style="padding:8px;"><strong>${question}</strong></td>
+        <td style="padding:8px;">${responseText}</td>
+      </tr>`;
   });
 
-  // Send the email
-  GmailApp.sendEmail(RECIPIENT_EMAIL, "New Google Form Response", emailBody);
+  emailBody += "</table>";
+
+  // Send the email with the form name in the subject
+  GmailApp.sendEmail(RECIPIENT_EMAIL, `New Response from "${formName}"`, "", {
+    htmlBody: emailBody,
+  });
 }
 
 // Installable trigger setup function
